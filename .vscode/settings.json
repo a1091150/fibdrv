@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "module.h": "c",
+        "cdev.h": "c",
+        "kobject.h": "c",
+        "device.h": "c",
+        "mutex.h": "c",
+        "types.h": "c",
+        "stddef.h": "c"
+    }
+}
