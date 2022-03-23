@@ -7,8 +7,47 @@
 
 #define FIB_DEV "/dev/fibonacci"
 
+#define FIBINUSERSPACE
+/* If gcc -D FIBINUSERSPACE is set, program use userspace function code to test
+ * fib sequence. */
+#ifdef FIBINUSERSPACE
+#include "fibseq.h"
+#endif
+
+
+void test_in_userspace(enum fibmethod m)
+{
+    void (*fptr[2])(long long) = {fibseq_basic, fibseq_basic_fast_doubling};
+    const int offset = 100;
+
+    for (int i = 0; i <= offset; i++) {
+        printf("Writing to " FIB_DEV ", returned the sequence %d\n", 1);
+    }
+
+    for (int i = 0; i <= offset; i++) {
+        long long sz = fibseq_basic_fast_doubling(i);
+        printf("Reading from " FIB_DEV
+               " at offset %d, returned the sequence "
+               "%lld.\n",
+               i, sz);
+    }
+
+    for (int i = offset; i >= 0; i--) {
+        long long sz = fibseq_basic_fast_doubling(i);
+        printf("Reading from " FIB_DEV
+               " at offset %d, returned the sequence "
+               "%lld.\n",
+               i, sz);
+    }
+}
+
 int main()
 {
+#ifdef FIBINUSERSPACE
+    test_in_userspace(basic);
+    return 0;
+#endif
+
     long long sz;
 
     char buf[1];
