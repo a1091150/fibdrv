@@ -6,6 +6,8 @@
         "device.h": "c",
         "mutex.h": "c",
         "types.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "limits.h": "c",
+        "climits": "c"
     }
 }
