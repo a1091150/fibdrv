@@ -17,7 +17,8 @@
 
 void test_in_userspace(enum fibmethod m)
 {
-    void (*fptr[2])(long long) = {fibseq_basic, fibseq_basic_fast_doubling};
+    long long (*fptr[2])(long long) = {fibseq_basic,
+                                       fibseq_basic_fast_doubling};
     const int offset = 100;
 
     for (int i = 0; i <= offset; i++) {
@@ -25,7 +26,7 @@ void test_in_userspace(enum fibmethod m)
     }
 
     for (int i = 0; i <= offset; i++) {
-        long long sz = fibseq_basic_fast_doubling(i);
+        long long sz = fptr[m](i);
         printf("Reading from " FIB_DEV
                " at offset %d, returned the sequence "
                "%lld.\n",
@@ -33,7 +34,7 @@ void test_in_userspace(enum fibmethod m)
     }
 
     for (int i = offset; i >= 0; i--) {
-        long long sz = fibseq_basic_fast_doubling(i);
+        long long sz = fptr[m](i);
         printf("Reading from " FIB_DEV
                " at offset %d, returned the sequence "
                "%lld.\n",
