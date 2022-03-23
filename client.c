@@ -45,7 +45,7 @@ void test_in_userspace(enum fibmethod m)
 int main()
 {
 #ifdef FIBINUSERSPACE
-    test_in_userspace(basic);
+    test_in_userspace(basic_fast_doubling);
     return 0;
 #endif
 

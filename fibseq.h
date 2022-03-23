@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #endif
 
+#include <limits.h>
 enum fibmethod { basic = 0, basic_fast_doubling };
 
 long long fibseq_basic(long long offset);

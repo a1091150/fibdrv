@@ -20,22 +20,18 @@ long long fibseq_basic(long long offset)
 
 long long fibseq_basic_fast_doubling(long long offset)
 {
-    unsigned long long h = 0;
-    for (int i = offset; i; i >>= 1, h++)
-        ;
+    unsigned long long mask = ULLONG_MAX ^ (ULLONG_MAX >> 1);
+    mask >>= __builtin_clz(offset);
 
     unsigned long long a = 0, b = 1;  // fib(0), fib(1)
-
-    for (unsigned long long mask = 1 << (h - 1); mask; mask >>= 1) {
+    for (; mask; mask >>= 1) {
         unsigned long long c = a * (2 * b - a);
         unsigned long long d = a * a + b * b;
-        if (mask & offset) {
-            a = d;
-            b = c + d;
-        } else {
-            a = c;
-            b = d;
-        }
+
+        int aset = !(mask & offset);
+        int bset = !!(mask & offset);
+        a = d ^ ((c ^ d) & -aset);
+        b = d + (c & -bset);
     }
 
     return a;
