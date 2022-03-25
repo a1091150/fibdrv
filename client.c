@@ -12,40 +12,38 @@
  * fib sequence. */
 #ifdef FIBINUSERSPACE
 #include "fibseq.h"
-#endif
-
 
 void test_in_userspace(enum fibmethod m)
 {
     long long (*fptr[2])(long long) = {fibseq_basic,
                                        fibseq_basic_fast_doubling};
-    const int offset = 100;
+    switch (m) {
+    case iter_basic:
+        fptr[0](0);
+        break;
+    case iter_fast_doubling:
+        fptr[1](0);
+        break;
+    case bn_basic:
+        char *buf;
+        buf = fibseq_basic_bn(0);
+        printf("%s\n", buf);
+        free(buf);
+        break;
+    case bn_fast_doubling:
+        break;
 
-    for (int i = 0; i <= offset; i++) {
-        printf("Writing to " FIB_DEV ", returned the sequence %d\n", 1);
-    }
-
-    for (int i = 0; i <= offset; i++) {
-        long long sz = fptr[m](i);
-        printf("Reading from " FIB_DEV
-               " at offset %d, returned the sequence "
-               "%lld.\n",
-               i, sz);
-    }
-
-    for (int i = offset; i >= 0; i--) {
-        long long sz = fptr[m](i);
-        printf("Reading from " FIB_DEV
-               " at offset %d, returned the sequence "
-               "%lld.\n",
-               i, sz);
+    default:
+        break;
     }
 }
+
+#endif
 
 int main()
 {
 #ifdef FIBINUSERSPACE
-    test_in_userspace(basic_fast_doubling);
+    test_in_userspace(bn_basic);
     return 0;
 #endif
 

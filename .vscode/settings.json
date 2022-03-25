@@ -8,6 +8,10 @@
         "types.h": "c",
         "stddef.h": "c",
         "limits.h": "c",
-        "climits": "c"
+        "climits": "c",
+        "type_traits": "c",
+        "fibseq.h": "c",
+        "bn_kernel.h": "c",
+        "stdlib.h": "c"
     }
 }

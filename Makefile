@@ -24,7 +24,7 @@ load:
 unload:
 	sudo rmmod $(TARGET_MODULE) || true >/dev/null
 
-client: client.c fibseq.c
+client: client.c fibseq.c bn_kernel.c
 	$(CC) -o $@ $^
 
 PRINTF = env printf

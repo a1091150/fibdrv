@@ -1,4 +1,3 @@
-
 #include "fibseq.h"
 
 long long fibseq_basic(long long offset)
@@ -16,7 +15,7 @@ long long fibseq_basic(long long offset)
     }
 
     return z;
-};
+}
 
 long long fibseq_basic_fast_doubling(long long offset)
 {
@@ -35,4 +34,27 @@ long long fibseq_basic_fast_doubling(long long offset)
     }
 
     return a;
-};
+}
+
+char *fibseq_basic_bn(long long offset)
+{
+    struct bn *a = bn_new(1);
+    a->number[0] = 0;
+    struct bn *b = bn_new(1);
+    b->number[0] = 1;
+
+    struct bn *c = bn_add(a, b);
+    char *result = bn_to_string(c);
+
+    struct bn *d = bn_mult(a, b);
+    struct bn *e = bn_square(a);
+    struct bn *f = bn_sub(a, b);
+    bn_multbytwo(a);
+    bn_free(a);
+    bn_free(b);
+    bn_free(c);
+    bn_free(d);
+    bn_free(e);
+    bn_free(f);
+    return result;
+}
