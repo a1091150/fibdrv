@@ -17,6 +17,8 @@ void test_in_userspace(enum fibmethod m)
 {
     long long (*fptr[2])(long long) = {fibseq_basic,
                                        fibseq_basic_fast_doubling};
+
+    char *buf;
     switch (m) {
     case iter_basic:
         fptr[0](0);
@@ -25,7 +27,6 @@ void test_in_userspace(enum fibmethod m)
         fptr[1](0);
         break;
     case bn_basic:
-        char *buf;
         buf = fibseq_basic_bn(0);
         printf("%s\n", buf);
         free(buf);
