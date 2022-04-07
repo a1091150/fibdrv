@@ -10,7 +10,6 @@
 
 int main()
 {
-
     long long sz;
 
     char buf[1];

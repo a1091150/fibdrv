@@ -19,12 +19,15 @@ $(GIT_HOOKS):
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
 	$(RM) client out
+	$(RM) uclient out
+	$(RM) uclient_picture.png
+	$(RM) uclient_time
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:
 	sudo rmmod $(TARGET_MODULE) || true >/dev/null
 
-client: client.c fibseq.c
+client: client.c
 	$(CC) -o $@ $^
 
 PRINTF = env printf
@@ -39,3 +42,11 @@ check: all
 	$(MAKE) unload
 	@diff -u out scripts/expected.txt && $(call pass)
 	@scripts/verify.py
+
+
+uclient: uclient.c fibseq.c
+	$(CC) -o $@ $^
+
+ucheck: uclient
+	./uclient > ./uclient_time
+	gnuplot scripts/uclieng_plot.gp

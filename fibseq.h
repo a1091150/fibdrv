@@ -7,9 +7,10 @@
 #endif
 
 #include <limits.h>
-enum fibmethod { basic = 0, basic_fast_doubling };
 
-long long fibseq_basic(long long offset);
+long long fibseq_basic(int offset);
 
-long long fibseq_basic_fast_doubling(long long offset);
+long long fibseq_basic_fast_doubling_branch(unsigned int offset);
+
+long long fibseq_basic_fast_doubling_branchless(unsigned int offset);
 #endif /* FIBSEQ_H */

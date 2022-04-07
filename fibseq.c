@@ -1,7 +1,7 @@
 
 #include "fibseq.h"
 
-long long fibseq_basic(long long offset)
+long long fibseq_basic(int offset)
 {
     if (!offset) {
         return 0;
@@ -16,9 +16,9 @@ long long fibseq_basic(long long offset)
     }
 
     return z;
-};
+}
 
-long long fibseq_basic_fast_doubling(long long offset)
+long long fibseq_basic_fast_doubling_branchless(unsigned int offset)
 {
     unsigned long long mask = ULLONG_MAX ^ (ULLONG_MAX >> 1);
     mask >>= __builtin_clz(offset);
@@ -35,4 +35,26 @@ long long fibseq_basic_fast_doubling(long long offset)
     }
 
     return a;
-};
+}
+
+
+long long fibseq_basic_fast_doubling_branch(unsigned int offset)
+{
+    unsigned long long mask = ULLONG_MAX ^ (ULLONG_MAX >> 1);
+    mask >>= __builtin_clz(offset);
+
+    unsigned long long a = 0, b = 1;  // fib(0), fib(1)
+    for (; mask; mask >>= 1) {
+        unsigned long long c = a * (2 * b - a);
+        unsigned long long d = a * a + b * b;
+        if (mask & offset) {
+            a = d;
+            b = c + d;
+        } else {
+            a = c;
+            b = d;
+        }
+    }
+
+    return a;
+}
