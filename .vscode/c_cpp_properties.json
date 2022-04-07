@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/include/**",
-                "/lib/modules/5.13.0-35-generic/build/include/**"
+                "/lib/modules/5.13.0-39-generic/build/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
