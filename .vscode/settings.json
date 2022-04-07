@@ -8,6 +8,7 @@
         "types.h": "c",
         "stddef.h": "c",
         "limits.h": "c",
-        "climits": "c"
+        "climits": "c",
+        "fibseq.h": "c"
     }
 }
