@@ -1,12 +1,8 @@
 #ifndef FIBSEQ_H
 #define FIBSEQ_H
-#ifdef FIBINUSERSPACE
-#include <stddef.h>
-#else
-#include <sys/types.h>
-#endif
 
 #include <limits.h>
+#include <stddef.h>
 
 long long fibseq_basic(int offset);
 
