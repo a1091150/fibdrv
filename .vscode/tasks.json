@@ -9,7 +9,6 @@
                 "-g",
                 "client.c",
                 "fibseq.c",
-                "bn_kernel.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],
