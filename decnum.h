@@ -2,6 +2,7 @@
 #define DECNUM_H
 
 #include <stdint.h>
+#include <stdlib.h>
 struct decnum {
     uint32_t size;
     uint32_t *digits;
@@ -14,7 +15,7 @@ struct decnum {
         }                           \
     }
 
-typedef decnum decnum_t;
+typedef struct decnum decnum_t;
 
 
 void decnum_new(decnum_t *ptr, uint32_t size);
