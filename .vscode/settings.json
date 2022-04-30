@@ -9,6 +9,7 @@
         "stddef.h": "c",
         "limits.h": "c",
         "climits": "c",
-        "fibseq.h": "c"
+        "fibseq.h": "c",
+        "decnum.h": "c"
     }
 }
