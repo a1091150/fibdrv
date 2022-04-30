@@ -7,47 +7,10 @@
 
 #define FIB_DEV "/dev/fibonacci"
 
-#define FIBINUSERSPACE
-/* If gcc -D FIBINUSERSPACE is set, program use userspace function code to test
- * fib sequence. */
-#ifdef FIBINUSERSPACE
-#include "fibseq.h"
 
-void test_in_userspace(enum fibmethod m)
-{
-    long long (*fptr[2])(long long) = {fibseq_basic,
-                                       fibseq_basic_fast_doubling};
-
-    char *buf;
-    switch (m) {
-    case iter_basic:
-        fptr[0](0);
-        break;
-    case iter_fast_doubling:
-        fptr[1](0);
-        break;
-    case bn_basic:
-        buf = fibseq_basic_bn(0);
-        printf("%s\n", buf);
-        free(buf);
-        break;
-    case bn_fast_doubling:
-        break;
-
-    default:
-        break;
-    }
-}
-
-#endif
 
 int main()
 {
-#ifdef FIBINUSERSPACE
-    test_in_userspace(bn_basic);
-    return 0;
-#endif
-
     long long sz;
 
     char buf[1];
