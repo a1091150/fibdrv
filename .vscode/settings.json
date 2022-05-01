@@ -10,6 +10,7 @@
         "limits.h": "c",
         "climits": "c",
         "fibseq.h": "c",
-        "decnum.h": "c"
+        "decnum.h": "c",
+        "limits": "c"
     }
 }

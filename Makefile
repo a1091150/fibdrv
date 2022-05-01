@@ -22,6 +22,7 @@ clean:
 	$(RM) uclient out
 	$(RM) uclient_picture.png
 	$(RM) uclient_time
+	$(RM) dclient out
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:
@@ -50,3 +51,7 @@ uclient: uclient.c fibseq.c
 ucheck: uclient
 	./uclient > ./uclient_time
 	gnuplot scripts/uclieng_plot.gp
+
+
+dclient: dclient.c decnum.c
+	$(CC) -o $@ $^
