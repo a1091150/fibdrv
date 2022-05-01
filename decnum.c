@@ -47,15 +47,15 @@ void decnum_add(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     result->cap = result->size + 1;
     decnum_new(result);
 
-    uint32_t carry = 0;
+    int32_t carry = 0;
     for (size_t i = 0; i < a2.size; i++) {
-        uint32_t digit = a1.digits[i] + a2.digits[i] + carry;
+        int32_t digit = a1.digits[i] + a2.digits[i] + carry;
         carry = digit >= DECMAXVALUE;
         result->digits[i] = digit % DECMAXVALUE;
     }
 
     for (size_t i = a2.size; i < a1.size; i++) {
-        uint32_t digit = a1.digits[i] + carry;
+        int32_t digit = a1.digits[i] + carry;
         carry = digit >= DECMAXVALUE;
         result->digits[i] = digit % DECMAXVALUE;
         if (!carry) {
@@ -70,10 +70,58 @@ void decnum_add(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     }
 }
 
+/*
+ * In fibonacci number, b1 is always greater than or equal to b2,
+ */
 void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
 {
     if (!result && !b1 && !b2) {
         return;
+    }
+
+    decnum_t a1 = DECNUM_INIT(b1->size, b1->cap);
+    a1.digits = b1->digits;
+    decnum_t a2 = DECNUM_INIT(b2->size, b2->cap);
+    a2.digits = b2->digits;
+
+    result->size = max(a1.size, a2.size);
+    result->cap = result->size;
+    decnum_new(result);
+
+    int32_t carry = 0;
+    for (size_t i = 0; i < a2.size; i++) {
+        int32_t digit = a1.digits[i] - a2.digits[i] - carry;
+        if (digit < 0) {
+            carry = 1;
+            result->digits[i] = digit + DECMAXVALUE;
+        } else {
+            carry = 0;
+            result->digits[i] = digit;
+        }
+    }
+
+    for (size_t i = a2.size; i < a1.size; i++) {
+        int32_t digit = a1.digits[i] - carry;
+        if (digit < 0) {
+            carry = 1;
+            result->digits[i] = digit + DECMAXVALUE;
+        } else {
+            carry = 0;
+            result->digits[i] = digit;
+        }
+    }
+
+    int ischanged = 0;
+    for (size_t i = 0; i < result->size; i++) {
+        if (result->digits[(result->size - i - 1)]) {
+            result->size = result->size - i;
+            ischanged = 1;
+            break;
+        }
+    }
+
+    if (!ischanged && !result->digits[0]) {
+        result->size = 1;
     }
 }
 

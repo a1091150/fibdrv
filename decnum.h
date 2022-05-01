@@ -6,7 +6,7 @@
 struct decnum {
     uint32_t size;
     uint32_t cap;
-    uint32_t *digits;
+    int32_t *digits;
 };
 
 #define DECNUM_INIT(a, b)                       \
@@ -16,7 +16,7 @@ struct decnum {
 
 typedef struct decnum decnum_t;
 
-#define DECMAXVALUE 1000000000  // 10^6
+#define DECMAXVALUE 1000000000  // 10^9
 #define max(a, b)              \
     ({                         \
         typeof(a) __a = (a);   \
