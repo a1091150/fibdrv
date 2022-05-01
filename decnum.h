@@ -5,20 +5,33 @@
 #include <stdlib.h>
 struct decnum {
     uint32_t size;
+    uint32_t cap;
     uint32_t *digits;
 };
 
-#define DECNUM_INIT                 \
-    {                               \
-        {                           \
-            .size = 0, .digits = 0, \
-        }                           \
+#define DECNUM_INIT(a, b)                       \
+    {                                           \
+        .size = (a), .cap = (b), .digits = NULL \
     }
 
 typedef struct decnum decnum_t;
 
+#define DECMAXVALUE 1000000000  // 10^6
+#define max(a, b)              \
+    ({                         \
+        typeof(a) __a = (a);   \
+        typeof(b) __b = (b);   \
+        __a > __b ? __a : __b; \
+    })
 
-void decnum_new(decnum_t *ptr, uint32_t size);
+#define min(a, b)              \
+    ({                         \
+        typeof(a) __a = (a);   \
+        typeof(b) __b = (b);   \
+        __a > __b ? __b : __a; \
+    })
+
+void decnum_new(decnum_t *ptr);
 void decnum_free(decnum_t *ptr);
 
 void decnum_add(const decnum_t *b1, const decnum_t *b2, decnum_t *result);
