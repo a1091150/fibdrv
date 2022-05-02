@@ -11,6 +11,22 @@ static inline void decnum_swap(decnum_t *b1, decnum_t *b2)
     b2->size = size;
 }
 
+static inline void decnum_restore_size(decnum_t *result)
+{
+    int ischanged = 0;
+    for (size_t i = 0; i < result->size; i++) {
+        if (result->digits[(result->size - i - 1)]) {
+            result->size = result->size - i;
+            ischanged = 1;
+            break;
+        }
+    }
+
+    if (!ischanged && !result->digits[0]) {
+        result->size = 1;
+    }
+}
+
 void decnum_new(decnum_t *ptr)
 {
     if (!ptr) {
@@ -71,7 +87,7 @@ void decnum_add(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
 }
 
 /*
- * In fibonacci number, b1 is always greater than or equal to b2,
+ * In fibonacci number, b1 is always greater than or equal to b2
  */
 void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
 {
@@ -111,18 +127,7 @@ void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
         }
     }
 
-    int ischanged = 0;
-    for (size_t i = 0; i < result->size; i++) {
-        if (result->digits[(result->size - i - 1)]) {
-            result->size = result->size - i;
-            ischanged = 1;
-            break;
-        }
-    }
-
-    if (!ischanged && !result->digits[0]) {
-        result->size = 1;
-    }
+    decnum_restore_size(result);
 }
 
 void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
@@ -130,4 +135,30 @@ void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     if (!result && !b1 && !b2) {
         return;
     }
+
+    result->size = b1->size + b2->size;
+    result->cap = result->size;
+    decnum_new(result);
+    const int32_t size = b1->size + b2->size;
+    int64_t *tmp = malloc(sizeof(int64_t) * size);
+
+    for (size_t i = 0; i < b1->size; i++) {
+        for (size_t j = 0; j < b2->size; j++) {
+            tmp[(i + j)] +=
+                ((int64_t) b1->digits[i]) * ((int64_t) b2->digits[j]);
+        }
+    }
+
+    uint64_t carry = 0;
+    for (size_t i = 0; i < size; i++) {
+        tmp[i] += carry;
+        carry = tmp[i] / DECMAXVALUE;
+        tmp[i] %= DECMAXVALUE;
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        result->digits[i] = tmp[i];
+    }
+    free(tmp);
+    decnum_restore_size(result);
 }
