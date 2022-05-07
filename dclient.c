@@ -17,16 +17,11 @@ int main()
     decnum_new(&b1);
     b1.digits[0] = DECMAXVALUE - 1;
 
-    decnum_t b2 = DECNUM_INIT(1, 2);
-    decnum_new(&b2);
-    b2.digits[0] = DECMAXVALUE - 1;
-
-
-    decnum_t res;
-    decnum_mult(&b1, &b2, &res);
     PRINTDECNUM(b1);
-    PRINTDECNUM(b2);
-    PRINTDECNUM(res);
-    decnum_free(&res);
+    decnum_mult_by_two(&b1);
+    decnum_mult_by_two(&b1);
+    decnum_mult_by_two(&b1);
+    decnum_mult_by_two(&b1);
+    PRINTDECNUM(b1);
     return 0;
 }

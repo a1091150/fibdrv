@@ -37,4 +37,5 @@ void decnum_free(decnum_t *ptr);
 void decnum_add(const decnum_t *b1, const decnum_t *b2, decnum_t *result);
 void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result);
 void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result);
+void decnum_mult_by_two(decnum_t *b1);
 #endif /* DECNUM_H */

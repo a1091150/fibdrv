@@ -162,3 +162,33 @@ void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     free(tmp);
     decnum_restore_size(result);
 }
+
+
+void decnum_mult_by_two(decnum_t *b1)
+{
+    if (!b1) {
+        return;
+    }
+
+    for (size_t i = 0; i < b1->size; i++) {
+        b1->digits[i] <<= 1;
+    }
+
+    int32_t carry = 0;
+    for (size_t i = 0; i < b1->size; i++) {
+        int32_t digit = b1->digits[i] + carry;
+        b1->digits[i] = digit % DECMAXVALUE;
+        carry = digit / DECMAXVALUE;
+    }
+
+    if (carry) {
+        b1->size++;
+        if (b1->size < b1->cap) {
+            b1->digits[(b1->size - 1)] = carry;
+        } else {
+            b1->cap = b1->size;
+            b1->digits = realloc(b1->digits, sizeof(uint32_t) * b1->cap);
+            b1->digits[(b1->size - 1)] = carry;
+        }
+    }
+}
