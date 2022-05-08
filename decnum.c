@@ -1,6 +1,6 @@
 #include "decnum.h"
 
-static inline void decnum_swap(decnum_t *b1, decnum_t *b2)
+void decnum_swap(decnum_t *b1, decnum_t *b2)
 {
     uint32_t *tmp, size;
     tmp = b1->digits;
@@ -141,6 +141,7 @@ void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     decnum_new(result);
     const int32_t size = b1->size + b2->size;
     int64_t *tmp = malloc(sizeof(int64_t) * size);
+    memset(tmp, 0, sizeof(int64_t) * size);
 
     for (size_t i = 0; i < b1->size; i++) {
         for (size_t j = 0; j < b2->size; j++) {

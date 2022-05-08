@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include "decnum.h"
+#include "fibseq.h"
 
 
 #define PRINTDECNUM(a)                                            \
@@ -13,15 +14,13 @@
 
 int main()
 {
-    decnum_t b1 = DECNUM_INIT(1, 2);
-    decnum_new(&b1);
-    b1.digits[0] = DECMAXVALUE - 1;
+    decnum_t fib = DECNUM_INIT(0, 0);
 
-    PRINTDECNUM(b1);
-    decnum_mult_by_two(&b1);
-    decnum_mult_by_two(&b1);
-    decnum_mult_by_two(&b1);
-    decnum_mult_by_two(&b1);
-    PRINTDECNUM(b1);
+    for (size_t i = 0; i < 100; i++) {
+        decnum_fast_doubling(i, &fib);
+        printf("%lu ", i);
+        PRINTDECNUM(fib);
+        decnum_free(&fib);
+    }
     return 0;
 }

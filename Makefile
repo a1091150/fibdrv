@@ -53,5 +53,5 @@ ucheck: uclient
 	gnuplot scripts/uclieng_plot.gp
 
 
-dclient: dclient.c decnum.c
+dclient: dclient.c decnum.c fibseq.c
 	$(CC) -o $@ $^
