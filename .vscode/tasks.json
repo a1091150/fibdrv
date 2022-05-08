@@ -7,8 +7,9 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "client.c",
+                "dclient.c",
                 "fibseq.c",
+                "decnum.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],

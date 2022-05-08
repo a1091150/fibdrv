@@ -11,6 +11,7 @@
         "climits": "c",
         "fibseq.h": "c",
         "decnum.h": "c",
-        "limits": "c"
+        "limits": "c",
+        "stdint.h": "c"
     }
 }
