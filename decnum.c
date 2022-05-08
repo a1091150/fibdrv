@@ -164,7 +164,7 @@ void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
 }
 
 
-void decnum_mult_by_two(decnum_t *b1)
+void decnum_multi_by_two(decnum_t *b1)
 {
     if (!b1) {
         return;
