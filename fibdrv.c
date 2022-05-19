@@ -19,7 +19,7 @@ MODULE_VERSION("0.1");
 /* MAX_LENGTH is set to 92 because
  * ssize_t can't fit the number > 92
  */
-#define MAX_LENGTH 92
+#define MAX_LENGTH 150
 
 static dev_t fib_dev = 0;
 static struct cdev *fib_cdev;
@@ -149,6 +149,11 @@ static ssize_t fib_read(struct file *file,
 {
     kdecnum_t b1 = KDECNUM_INIT(0, 0);
     int res = decnum_fib_fast_doubling(*offset, &b1);
+    size_t ss = min(size, b1.size * sizeof(int32_t));
+
+    access_ok(buf, ss);
+    res = copy_to_user(buf, b1.digits, ss);
+    kdecnum_free(&b1);
     return res;
 }
 

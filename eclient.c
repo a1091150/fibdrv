@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,15 +8,25 @@
 
 #define FIB_DEV "/dev/fibonacci"
 
-#define SIZEOFBUF 500
+#include "decnum.h"
+
+#define PRINTDECNUM(a)                                            \
+    printf("%" PRIu32, (a).digits[((a).size - 1)]);               \
+    for (size_t i = 1; i < (a).size; i++) {                       \
+        printf(",%09" PRIu32 "", (a).digits[((a).size - i - 1)]); \
+    }                                                             \
+    printf("\n");
+
+
+#define BUFSIZE 8
 
 int main()
 {
     long long sz;
 
-    char buf[SIZEOFBUF];
+    int32_t buf[BUFSIZE];
     char write_buf[] = "testing writing";
-    memset(buf, 0, sizeof(char) * 500);
+    memset(buf, 0, sizeof(int32_t) * BUFSIZE);
     int offset = 100; /* TODO: try test something bigger than the limit */
 
     int fd = open(FIB_DEV, O_RDWR);
@@ -24,8 +35,13 @@ int main()
         exit(1);
     }
 
-    lseek(fd, 6, SEEK_SET);
-    sz = read(fd, buf, SIZEOFBUF);
+    lseek(fd, 99, SEEK_SET);
+    sz = read(fd, buf, BUFSIZE * sizeof(int32_t));
+
+
+    decnum_t fib = DECNUM_INIT(BUFSIZE, BUFSIZE);
+    fib.digits = buf;
+    PRINTDECNUM(fib);
 
     close(fd);
     return 0;
