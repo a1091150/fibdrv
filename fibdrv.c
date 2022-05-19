@@ -7,6 +7,8 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 
+#include "kdecnum.h"
+
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
 MODULE_DESCRIPTION("Fibonacci engine driver");
@@ -24,6 +26,88 @@ static struct cdev *fib_cdev;
 static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
+static int decnum_fib_fast_doubling(long long k, kdecnum_t *result)
+{
+    if (!result) {
+        return -1;
+    }
+
+    unsigned long long mask = ULLONG_MAX ^ (ULLONG_MAX >> 1);
+    mask >>= __builtin_clz(k);
+
+    kdecnum_t a = KDECNUM_INIT(1, 1);
+    kdecnum_new(&a);
+    a.digits[0] = 0;
+    kdecnum_t b = KDECNUM_INIT(1, 1);
+    kdecnum_new(&b);
+    b.digits[0] = 1;
+
+    for (; mask; mask >>= 1) {
+        if (mask & k) {
+            kdecnum_t c = KDECNUM_INIT(0, 0);
+            kdecnum_t d = KDECNUM_INIT(0, 0);
+
+            kdecnum_t aq = KDECNUM_INIT(0, 0);
+            kdecnum_t bq = KDECNUM_INIT(0, 0);
+
+            kdecnum_t ab = KDECNUM_INIT(0, 0);
+
+            kdecnum_mult(&a, &a, &aq);
+            kdecnum_mult(&b, &b, &bq);
+
+            kdecnum_mult(&a, &b, &ab);
+            kdecnum_multi_by_two(&ab);
+            kdecnum_add(&ab, &bq, &c);
+
+            kdecnum_add(&aq, &bq, &d);
+
+            // a = a * a + b * b
+            kdecnum_swap(&a, &d);
+
+            // b = a * (2 * b - a) + a * a + b * b =  2 * a * b + b * b
+            kdecnum_swap(&b, &c);
+
+            kdecnum_free(&c);
+            kdecnum_free(&d);
+            kdecnum_free(&ab);
+            kdecnum_free(&aq);
+            kdecnum_free(&bq);
+        } else {
+            kdecnum_t c = KDECNUM_INIT(0, 0);
+            kdecnum_t d = KDECNUM_INIT(0, 0);
+
+            kdecnum_t aq = KDECNUM_INIT(0, 0);
+            kdecnum_t bq = KDECNUM_INIT(0, 0);
+
+            kdecnum_t ab = KDECNUM_INIT(0, 0);
+
+            kdecnum_mult(&a, &a, &aq);
+            kdecnum_mult(&b, &b, &bq);
+            kdecnum_add(&aq, &bq, &d);
+
+            kdecnum_multi_by_two(&b);
+            kdecnum_mult(&a, &b, &ab);
+            kdecnum_sub(&ab, &aq, &c);
+
+            // a = 2ab - a^2
+            kdecnum_swap(&a, &c);
+            // b = a^2 + b^2
+            kdecnum_swap(&b, &d);
+
+            kdecnum_free(&c);
+            kdecnum_free(&d);
+            kdecnum_free(&aq);
+            kdecnum_free(&bq);
+        }
+    }
+
+    kdecnum_swap(&a, result);
+    kdecnum_free(&b);
+    return 1;
+}
+
+
+/*
 static long long fib_sequence(long long k)
 {
     if (!k) {
@@ -40,6 +124,7 @@ static long long fib_sequence(long long k)
 
     return z;
 }
+*/
 
 static int fib_open(struct inode *inode, struct file *file)
 {
@@ -62,7 +147,9 @@ static ssize_t fib_read(struct file *file,
                         size_t size,
                         loff_t *offset)
 {
-    return (ssize_t) fib_sequence(*offset);
+    kdecnum_t b1 = KDECNUM_INIT(0, 0);
+    int res = decnum_fib_fast_doubling(*offset, &b1);
+    return res;
 }
 
 /* write operation is skipped */

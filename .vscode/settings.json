@@ -12,6 +12,10 @@
         "fibseq.h": "c",
         "decnum.h": "c",
         "limits": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "kdecnum.h": "c",
+        "cstdlib": "c",
+        "slab.h": "c",
+        "inttypes.h": "c"
     }
 }
