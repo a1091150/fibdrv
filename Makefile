@@ -17,13 +17,15 @@ $(GIT_HOOKS):
 	@scripts/install-git-hooks
 	@echo
 
-clean:
+clean: unload
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
 	$(RM) client out
 	$(RM) uclient out
 	$(RM) uclient_picture.png
 	$(RM) uclient_time
 	$(RM) dclient out
+	$(RM) eclient_picture.png
+	$(RM) eclient out
 load:
 	sudo insmod $(TARGET_MODULE).ko
 unload:
@@ -59,3 +61,9 @@ dclient: dclient.c decnum.c fibseq.c
 
 eclient: eclient.c
 	$(CC) -o $@ $^
+
+eall: all eclient
+	$(MAKE) unload
+	$(MAKE) load
+	sudo taskset -c 1 ./eclient > ./eclient_time
+	gnuplot scripts/eclient_plot.gp

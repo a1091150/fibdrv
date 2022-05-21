@@ -35,10 +35,11 @@ int main()
         exit(1);
     }
 
-    lseek(fd, 99, SEEK_SET);
-    sz = read(fd, buf, BUFSIZE * sizeof(int32_t));
-
-
+    for (int i = 0; i < 99; i++) {
+        lseek(fd, 50, SEEK_SET);
+        sz = read(fd, buf, BUFSIZE * sizeof(int32_t));
+        printf("%d %lld\n", i, sz);
+    }
     decnum_t fib = DECNUM_INIT(BUFSIZE, BUFSIZE);
     fib.digits = buf;
     PRINTDECNUM(fib);

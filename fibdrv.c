@@ -148,13 +148,17 @@ static ssize_t fib_read(struct file *file,
                         loff_t *offset)
 {
     kdecnum_t b1 = KDECNUM_INIT(0, 0);
-    int res = decnum_fib_fast_doubling(*offset, &b1);
-    size_t ss = min(size, b1.size * sizeof(int32_t));
 
+    ktime_t kk = ktime_get();
+    int res = decnum_fib_fast_doubling(*offset, &b1);
+    kk = ktime_sub(ktime_get(), kk);
+    ssize_t dd = ktime_to_ns(kk);
+
+    size_t ss = min(size, b1.size * sizeof(int32_t));
     access_ok(buf, ss);
     res = copy_to_user(buf, b1.digits, ss);
     kdecnum_free(&b1);
-    return res;
+    return dd;
 }
 
 /* write operation is skipped */
