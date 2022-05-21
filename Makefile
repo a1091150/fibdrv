@@ -24,6 +24,7 @@ clean: unload
 	$(RM) uclient_picture.png
 	$(RM) uclient_time
 	$(RM) dclient out
+	$(RM) eclient_time
 	$(RM) eclient_picture.png
 	$(RM) eclient out
 load:
@@ -62,8 +63,22 @@ dclient: dclient.c decnum.c fibseq.c
 eclient: eclient.c
 	$(CC) -o $@ $^
 
-eall: all eclient
+eplot: all eclient
 	$(MAKE) unload
 	$(MAKE) load
 	sudo taskset -c 1 ./eclient > ./eclient_time
 	gnuplot scripts/eclient_plot.gp
+
+AA := $(shell cat /proc/sys/kernel/randomize_va_space)
+BB := $(shell cat /sys/devices/system/cpu/intel_pstate/no_turbo)
+eall: all eclient
+	@echo "原本 ASLR 數值: $(AA)"
+	@echo "原本 Intel turbo mode 數值: $(BB)"
+	sudo sh -c "echo 0 > /proc/sys/kernel/randomize_va_space"
+	sudo sh -c "echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo"
+	$(MAKE) unload
+	$(MAKE) load
+	sudo taskset -c 1 ./eclient > ./eclient_time
+	gnuplot scripts/eclient_plot.gp
+	sudo sh -c "echo $(AA) > /proc/sys/kernel/randomize_va_space"
+	sudo sh -c "echo $(BB) > /sys/devices/system/cpu/intel_pstate/no_turbo"
