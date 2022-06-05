@@ -90,3 +90,8 @@ eall: all eclient noturbo noaslr performance irqaffinity
 	$(MAKE) load
 	sudo taskset -c 19 ./eclient > ./eclient_time
 	gnuplot scripts/eclient_plot.gp
+
+
+etrace: eclient
+	sudo trace-cmd record --max-graph-depth 1  -e all taskset -c 19 ./eclient > ./eclient_time
+	gnuplot scripts/eclient_plot.gp
