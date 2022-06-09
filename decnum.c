@@ -11,6 +11,12 @@ void decnum_swap(decnum_t *b1, decnum_t *b2)
     b2->size = size;
 }
 
+static void decnum_clean(decnum_t *b1)
+{
+    b1->size = 0;
+    memset(b1->digits, 0, sizeof(int32_t) * b1->cap);
+}
+
 static inline void decnum_restore_size(decnum_t *result)
 {
     int ischanged = 0;
@@ -47,14 +53,15 @@ void decnum_free(decnum_t *ptr)
 
 void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result)
 {
-    if (!result && !b1 && !b2) {
+    if (!result || !b1 || !b2) {
         return;
     }
 
-    if(b1->size > result->cap || b2->size > result->cap){
+    if (b1->size > result->cap || b2->size > result->cap) {
         return;
     }
 
+    decnum_clean(result);
 
     decnum_t a1 = DECNUM_INIT(b1->size, b1->cap);
     a1.digits = b1->digits;
@@ -88,11 +95,17 @@ void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result)
 /*
  * In fibonacci number, b1 is always greater than or equal to b2
  */
-void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
+void decnum_sub(decnum_t *b1, decnum_t *b2, decnum_t *result)
 {
-    if (!result && !b1 && !b2) {
+    if (!result || !b1 || !b2) {
         return;
     }
+
+    if (b1->size > result->cap) {
+        return;
+    }
+
+    decnum_clean(result);
 
     decnum_t a1 = DECNUM_INIT(b1->size, b1->cap);
     a1.digits = b1->digits;
@@ -106,27 +119,22 @@ void decnum_sub(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
     int32_t carry = 0;
     for (size_t i = 0; i < a2.size; i++) {
         int32_t digit = a1.digits[i] - a2.digits[i] - carry;
-        if (digit < 0) {
-            carry = 1;
-            result->digits[i] = digit + DECMAXVALUE;
-        } else {
-            carry = 0;
-            result->digits[i] = digit;
-        }
+        carry = digit < 0;
+        result->digits[i] = digit + (DECMAXVALUE & -carry);
     }
 
     for (size_t i = a2.size; i < a1.size; i++) {
         int32_t digit = a1.digits[i] - carry;
-        if (digit < 0) {
-            carry = 1;
-            result->digits[i] = digit + DECMAXVALUE;
-        } else {
-            carry = 0;
-            result->digits[i] = digit;
-        }
+        carry = digit < 0;
+        result->digits[i] = digit + (DECMAXVALUE & -carry);
     }
 
-    decnum_restore_size(result);
+    result->size = a1.size;
+    size_t i = a1.size - 1;
+    while (i && !result->digits[i]) {
+        result->size--;
+        i--;
+    }
 }
 
 void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
