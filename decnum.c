@@ -96,10 +96,6 @@ void decnum_sub(decnum_t *b1, decnum_t *b2, decnum_t *result)
     decnum_t a2 = DECNUM_INIT(b2->size, b2->cap);
     a2.digits = b2->digits;
 
-    result->size = max(a1.size, a2.size);
-    result->cap = result->size;
-    decnum_new(result);
-
     int32_t carry = 0;
     for (size_t i = 0; i < a2.size; i++) {
         int32_t digit = a1.digits[i] - a2.digits[i] - carry;
@@ -175,14 +171,8 @@ void decnum_multi_by_two(decnum_t *b1)
         carry = digit / DECMAXVALUE;
     }
 
-    if (carry) {
+    if (carry && (b1->size < b1->cap)) {
+        b1->digits[b1->size] = carry;
         b1->size++;
-        if (b1->size < b1->cap) {
-            b1->digits[(b1->size - 1)] = carry;
-        } else {
-            b1->cap = b1->size;
-            b1->digits = realloc(b1->digits, sizeof(uint32_t) * b1->cap);
-            b1->digits[(b1->size - 1)] = carry;
-        }
     }
 }
