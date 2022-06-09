@@ -17,22 +17,6 @@ static void decnum_clean(decnum_t *b1)
     memset(b1->digits, 0, sizeof(int32_t) * b1->cap);
 }
 
-static inline void decnum_restore_size(decnum_t *result)
-{
-    int ischanged = 0;
-    for (size_t i = 0; i < result->size; i++) {
-        if (result->digits[(result->size - i - 1)]) {
-            result->size = result->size - i;
-            ischanged = 1;
-            break;
-        }
-    }
-
-    if (!ischanged && !result->digits[0]) {
-        result->size = 1;
-    }
-}
-
 void decnum_new(decnum_t *ptr)
 {
     if (!ptr) {
