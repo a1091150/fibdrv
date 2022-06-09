@@ -14,14 +14,12 @@
 
 int main()
 {
-    decnum_t a1 = DECNUM_INIT(3, 8);
+    decnum_t a1 = DECNUM_INIT(1, 8);
     decnum_new(&a1);
-    a1.digits[0] = 0;
-    a1.digits[1] = 0;
-    a1.digits[2] = 1;
+    a1.digits[0] = DECMAXVALUE - 1;
     decnum_t a2 = DECNUM_INIT(1, 8);
     decnum_new(&a2);
-    a2.digits[0] = 1;
+    a2.digits[0] = 6;
 
     decnum_t a3 = DECNUM_INIT(1, 8);
     decnum_new(&a3);
@@ -29,8 +27,9 @@ int main()
     // decnum_t a4 = DECNUM_INIT(1, 8);
     // decnum_new(&a4);
 
-    decnum_sub(&a1, &a2, &a3);
+    decnum_mult(&a1, &a2, &a3);
     // decnum_add(&a1, &a2, &a4);
+    // a3.size = 8;
     PRINTDECNUM(a3);
     // PRINTDECNUM(a4);
     return 0;

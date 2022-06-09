@@ -139,36 +139,38 @@ void decnum_sub(decnum_t *b1, decnum_t *b2, decnum_t *result)
 
 void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
 {
-    if (!result && !b1 && !b2) {
+    if (!result || !b1 || !b2) {
         return;
     }
 
+    if ((b1->size + b2->size) > result->cap) {
+        return;
+    }
+
+    decnum_clean(result);
     result->size = b1->size + b2->size;
-    result->cap = result->size;
-    decnum_new(result);
+
     const int32_t size = b1->size + b2->size;
-    int64_t *tmp = malloc(sizeof(int64_t) * size);
-    memset(tmp, 0, sizeof(int64_t) * size);
 
     for (size_t i = 0; i < b1->size; i++) {
         for (size_t j = 0; j < b2->size; j++) {
-            tmp[(i + j)] +=
+            int64_t carry =
                 ((int64_t) b1->digits[i]) * ((int64_t) b2->digits[j]);
+            size_t k = i + j;
+            do {
+                uint64_t vv = carry + result->digits[k];
+                result->digits[k] = vv % DECMAXVALUE;
+                carry = vv / DECMAXVALUE;
+                k++;
+            } while ((k < size) && carry);
         }
     }
 
-    uint64_t carry = 0;
-    for (size_t i = 0; i < size; i++) {
-        tmp[i] += carry;
-        carry = tmp[i] / DECMAXVALUE;
-        tmp[i] %= DECMAXVALUE;
+    size_t i = result->size - 1;
+    while (i && !result->digits[i]) {
+        result->size--;
+        i--;
     }
-
-    for (size_t i = 0; i < size; i++) {
-        result->digits[i] = tmp[i];
-    }
-    free(tmp);
-    decnum_restore_size(result);
 }
 
 
