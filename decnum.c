@@ -2,19 +2,43 @@
 
 void decnum_swap(decnum_t *b1, decnum_t *b2)
 {
-    uint32_t *tmp, size;
+    uint32_t *tmp, size, cap;
     tmp = b1->digits;
     size = b1->size;
     b1->digits = b2->digits;
     b1->size = b2->size;
     b2->digits = tmp;
     b2->size = size;
+
+    cap = b1->cap;
+    b1->cap = b2->cap;
+    b2->cap = cap;
 }
 
-static void decnum_clean(decnum_t *b1)
+void decnum_clean(decnum_t *b1)
 {
     b1->size = 0;
     memset(b1->digits, 0, sizeof(int32_t) * b1->cap);
+}
+
+/*
+    b1: destination
+    b2: source
+*/
+void decnum_assign(decnum_t *b1, decnum_t *b2)
+{
+    if (!b1 || !b2 || b1 == b2) {
+        return;
+    }
+
+    if (!b1->digits || !b2->digits) {
+        return;
+    }
+
+    decnum_clean(b1);
+    b1->size = min(b1->cap, b2->size);
+    memcpy(b1->digits, b2->digits, sizeof(int32_t) * b1->size);
+    memset(b1->digits + b1->size, 0, b1->cap - b1->size);
 }
 
 void decnum_new(decnum_t *ptr)
@@ -45,14 +69,16 @@ void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result)
         return;
     }
 
-    decnum_clean(result);
-
     decnum_t a1 = DECNUM_INIT(b1->size, b1->cap);
     a1.digits = b1->digits;
     decnum_t a2 = DECNUM_INIT(b2->size, b2->cap);
     a2.digits = b2->digits;
     if (b2->size > b1->size) {
         decnum_swap(&a1, &a2);
+    }
+
+    if (b1 != result && b2 != result) {
+        decnum_clean(result);
     }
 
     int32_t carry = 0;
@@ -62,17 +88,23 @@ void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result)
         result->digits[i] = digit % DECMAXVALUE;
     }
 
-    result->size = a2.size;
-    for (size_t i = a2.size; (i < a1.size) && carry; i++) {
-        int32_t digit = a1.digits[i] + carry;
-        carry = digit >= DECMAXVALUE;
-        result->digits[i] = digit % DECMAXVALUE;
-        result->size += carry;
-    }
+    if (carry) {
+        result->size = a2.size;
+        for (size_t i = a2.size; (i < a1.size) && carry; i++) {
+            int32_t digit = a1.digits[i] + carry;
+            carry = digit >= DECMAXVALUE;
+            result->digits[i] = digit % DECMAXVALUE;
+            result->size += carry;
+        }
 
-    if ((result->size < result->cap) && carry) {
-        result->digits[result->size] = 1;
-        result->size += 1;
+        if (result->size < result->cap) {
+            result->digits[result->size] = 1;
+            result->size += 1;
+        }
+    } else {
+        result->size = a1.size;
+        memcpy(result->digits + a2.size, a1.digits + a2.size,
+               sizeof(int32_t) * (a1.size - a2.size));
     }
 }
 
@@ -85,16 +117,18 @@ void decnum_sub(decnum_t *b1, decnum_t *b2, decnum_t *result)
         return;
     }
 
-    if (b1->size > result->cap) {
+    if (b1->size > result->cap || !b1->size || !b2->size) {
         return;
     }
-
-    decnum_clean(result);
 
     decnum_t a1 = DECNUM_INIT(b1->size, b1->cap);
     a1.digits = b1->digits;
     decnum_t a2 = DECNUM_INIT(b2->size, b2->cap);
     a2.digits = b2->digits;
+
+    if (b1 != result && b2 != result) {
+        decnum_clean(result);
+    }
 
     int32_t carry = 0;
     for (size_t i = 0; i < a2.size; i++) {
@@ -123,7 +157,7 @@ void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result)
         return;
     }
 
-    if ((b1->size + b2->size) > result->cap) {
+    if ((b1->size + b2->size) > result->cap || !b1->size || !b2->size) {
         return;
     }
 

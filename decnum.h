@@ -36,6 +36,8 @@ typedef struct decnum decnum_t;
 void decnum_new(decnum_t *ptr);
 void decnum_free(decnum_t *ptr);
 void decnum_swap(decnum_t *b1, decnum_t *b2);
+void decnum_clean(decnum_t *b1);
+void decnum_assign(decnum_t *b1, decnum_t *b2);
 void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result);
 void decnum_sub(decnum_t *b1, decnum_t *b2, decnum_t *result);
 void decnum_mult(const decnum_t *b1, const decnum_t *b2, decnum_t *result);
