@@ -14,23 +14,12 @@
 
 int main()
 {
-    decnum_t a1 = DECNUM_INIT(1, 8);
-    decnum_new(&a1);
-    a1.digits[0] = DECMAXVALUE - 1;
-    decnum_t a2 = DECNUM_INIT(1, 8);
-    decnum_new(&a2);
-    a2.digits[0] = 6;
-
-    decnum_t a3 = DECNUM_INIT(1, 8);
-    decnum_new(&a3);
-
-    // decnum_t a4 = DECNUM_INIT(1, 8);
-    // decnum_new(&a4);
-
-    decnum_mult(&a1, &a2, &a3);
-    // decnum_add(&a1, &a2, &a4);
-    // a3.size = 8;
-    PRINTDECNUM(a3);
-    // PRINTDECNUM(a4);
+    decnum_t fib = DECNUM_INIT(0, 0);
+    for (size_t i = 0; i < 100; i++) {
+        decnum_fast_doubling(i, &fib);
+        printf("%ld ", i);
+        PRINTDECNUM(fib);
+        decnum_free(&fib);
+    }
     return 0;
 }
