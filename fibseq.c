@@ -151,5 +151,7 @@ ft:
 fb:
     decnum_free(&a);
 fa:
-    return;
+    result->cap = 0;
+    result->size = 0;
+    result->digits = NULL;
 }

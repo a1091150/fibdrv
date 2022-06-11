@@ -5,13 +5,14 @@ void decnum_swap(decnum_t *b1, decnum_t *b2)
     uint32_t *tmp, size, cap;
     tmp = b1->digits;
     size = b1->size;
+    cap = b1->cap;
+
     b1->digits = b2->digits;
     b1->size = b2->size;
+    b1->cap = b2->cap;
+
     b2->digits = tmp;
     b2->size = size;
-
-    cap = b1->cap;
-    b1->cap = b2->cap;
     b2->cap = cap;
 }
 
@@ -91,13 +92,13 @@ void decnum_add(decnum_t *b1, decnum_t *b2, decnum_t *result)
     if (carry) {
         result->size = a2.size;
         for (size_t i = a2.size; (i < a1.size) && carry; i++) {
-            int32_t digit = a1.digits[i] + carry;
+            int32_t digit = a1.digits[i] + 1;
+            result->size += 1;
             carry = digit >= DECMAXVALUE;
             result->digits[i] = digit % DECMAXVALUE;
-            result->size += carry;
         }
 
-        if (result->size < result->cap) {
+        if ((result->size < result->cap) && carry) {
             result->digits[result->size] = 1;
             result->size += 1;
         }
