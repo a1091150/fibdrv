@@ -60,7 +60,7 @@ void kdecnum_free(kdecnum_t *ptr)
     kfree(ptr->digits);
 }
 
-void kdecnum_add( kdecnum_t *b1,  kdecnum_t *b2, kdecnum_t *result)
+void kdecnum_add(kdecnum_t *b1, kdecnum_t *b2, kdecnum_t *result)
 {
     if (!result || !b1 || !b2) {
         return;
@@ -112,7 +112,7 @@ void kdecnum_add( kdecnum_t *b1,  kdecnum_t *b2, kdecnum_t *result)
 /*
  * In fibonacci number, b1 is always greater than or equal to b2
  */
-void kdecnum_sub( kdecnum_t *b1,  kdecnum_t *b2, kdecnum_t *result)
+void kdecnum_sub(kdecnum_t *b1, kdecnum_t *b2, kdecnum_t *result)
 {
     if (!result || !b1 || !b2) {
         return;

@@ -31,79 +31,98 @@ static int decnum_fib_fast_doubling(long long k, kdecnum_t *result)
     if (!result) {
         return -1;
     }
+    
+    long long int sp = (k / 42) + 2;
+
+    kdecnum_t a = KDECNUM_INIT(1, sp);
+    kdecnum_new(&a);
+
+    if (!a.digits) {
+        goto fa;
+    }
+
+    kdecnum_t b = KDECNUM_INIT(1, sp);
+    kdecnum_new(&b);
+
+    if (!b.digits) {
+        goto fb;
+    }
+
+    kdecnum_t tmp = KDECNUM_INIT(1, sp);
+    kdecnum_new(&tmp);
+
+    if (!tmp.digits) {
+        goto ft;
+    }
+
+    kdecnum_t tmp2 = KDECNUM_INIT(1, sp);
+    kdecnum_new(&tmp2);
+
+    if (!tmp2.digits) {
+        goto ft2;
+    }
+
+    kdecnum_clean(&a);
+    kdecnum_clean(&b);
+    kdecnum_clean(&tmp);
+    kdecnum_clean(&tmp2);
+
+    a.size = 1;
+    a.digits[0] = 0;
+    b.size = 1;
+    b.digits[0] = 1;
 
     unsigned long long mask = ULLONG_MAX ^ (ULLONG_MAX >> 1);
     mask >>= __builtin_clz(k);
 
-    kdecnum_t a = KDECNUM_INIT(1, 1);
-    kdecnum_new(&a);
-    a.digits[0] = 0;
-    kdecnum_t b = KDECNUM_INIT(1, 1);
-    kdecnum_new(&b);
-    b.digits[0] = 1;
 
     for (; mask; mask >>= 1) {
         if (mask & k) {
-            kdecnum_t c = KDECNUM_INIT(0, 0);
-            kdecnum_t d = KDECNUM_INIT(0, 0);
+            // A = (a + b)^2 - 2ab = a^2 + b^2
+            kdecnum_add(&a, &b, &tmp);
+            kdecnum_mult(&tmp, &tmp, &tmp2);
+            kdecnum_mult(&a, &b, &tmp);
+            kdecnum_multi_by_two(&tmp);
+            kdecnum_sub(&tmp2, &tmp, &tmp);
 
-            kdecnum_t aq = KDECNUM_INIT(0, 0);
-            kdecnum_t bq = KDECNUM_INIT(0, 0);
+            // B = (a + b)^2 - a^2
+            kdecnum_mult(&a, &a, &b);
+            kdecnum_sub(&tmp2, &b, &b);
 
-            kdecnum_t ab = KDECNUM_INIT(0, 0);
-
-            kdecnum_mult(&a, &a, &aq);
-            kdecnum_mult(&b, &b, &bq);
-
-            kdecnum_mult(&a, &b, &ab);
-            kdecnum_multi_by_two(&ab);
-            kdecnum_add(&ab, &bq, &c);
-
-            kdecnum_add(&aq, &bq, &d);
-
-            // a = a * a + b * b
-            kdecnum_swap(&a, &d);
-
-            // b = a * (2 * b - a) + a * a + b * b =  2 * a * b + b * b
-            kdecnum_swap(&b, &c);
-
-            kdecnum_free(&c);
-            kdecnum_free(&d);
-            kdecnum_free(&ab);
-            kdecnum_free(&aq);
-            kdecnum_free(&bq);
+            kdecnum_assign(&a, &tmp);
         } else {
-            kdecnum_t c = KDECNUM_INIT(0, 0);
-            kdecnum_t d = KDECNUM_INIT(0, 0);
+            // B = a^2 + b^2
+            kdecnum_mult(&a, &a, &tmp);
+            kdecnum_mult(&b, &b, &tmp2);
+            kdecnum_add(&tmp, &tmp2, &tmp2);
 
-            kdecnum_t aq = KDECNUM_INIT(0, 0);
-            kdecnum_t bq = KDECNUM_INIT(0, 0);
-
-            kdecnum_t ab = KDECNUM_INIT(0, 0);
-
-            kdecnum_mult(&a, &a, &aq);
-            kdecnum_mult(&b, &b, &bq);
-            kdecnum_add(&aq, &bq, &d);
-
+            // A = a * (2 * b - a)
             kdecnum_multi_by_two(&b);
-            kdecnum_mult(&a, &b, &ab);
-            kdecnum_sub(&ab, &aq, &c);
+            kdecnum_sub(&b, &a, &b);
+            kdecnum_mult(&b, &a, &tmp);
+            kdecnum_assign(&b, &tmp2);
 
-            // a = 2ab - a^2
-            kdecnum_swap(&a, &c);
-            // b = a^2 + b^2
-            kdecnum_swap(&b, &d);
-
-            kdecnum_free(&c);
-            kdecnum_free(&d);
-            kdecnum_free(&aq);
-            kdecnum_free(&bq);
+            kdecnum_assign(&a, &tmp);
         }
     }
 
-    kdecnum_swap(&a, result);
+    kdecnum_free(&tmp);
+    kdecnum_free(&tmp2);
     kdecnum_free(&b);
+    kdecnum_swap(result, &a);
     return 1;
+
+ft2:
+    kdecnum_free(&tmp);
+ft:
+    kdecnum_free(&b);
+fb:
+    kdecnum_free(&a);
+fa:
+    result->cap = 0;
+    result->size = 0;
+    result->digits = NULL;
+    return -1;
 }
 
 
